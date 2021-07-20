@@ -1,0 +1,51 @@
+//var token = "1828306263:AAGqq8A59hhsDCPhsaTseuVUmjVxaNed9Lw";
+//var telegramAppUrl = "https://api.telegram.org/bot" + token;
+//var webAppUrl = "https://script.google.com/macros/s/AKfycbyPXx7wkRFWDrybgbqnorjCN3MoBmw0NWPlfNPoPofNpTZk4WsUbWI5apYvriIe6OO_ZA/exec";
+
+var token = "1783234047:AAF5CADJgDjqpRpvA0uqUH_F57tLngnjjvM"; // FILL IN YOUR OWN TOKEN
+var telegramUrl = "https://api.telegram.org/bot" + token;
+var webAppUrl = "https://script.google.com/macros/s/AKfycbyR08DxJwGu4e2duaQTmxRQ4kMwtxBK88JKNjR68O4Nq8F1EmcU95BaWWxMN8VS_eoC/exec"; // FILL IN YOUR GOOGLE WEB APP ADDRESS
+//var ssId = ""; // FILL IN THE ID OF YOUR SPREADSHEET
+//var groupid = "-516035263";
+
+function getMe() {
+  var url = telegramUrl + "/getMe";
+  var response = UrlFetchApp.fetch(url);
+  Logger.log(response.getContentText());
+}
+
+function setWebhook() {
+  var url = telegramUrl + "/setWebhook?url=" + webAppUrl;
+  var response = UrlFetchApp.fetch(url);
+  Logger.log(response.getContentText());
+}
+
+function sendText(id) {
+  var url = telegramUrl + "/sendMessage?chat_id=" + id + "&text=" + "How are you?";
+  var response = UrlFetchApp.fetch(url);
+  Logger.log(response.getContentText());
+}
+
+function sendText2(id) {
+  var url = telegramUrl + "/sendMessage?chat_id=" + id + "&text=" + "What is your name?";
+  var response = UrlFetchApp.fetch(url);
+  Logger.log(response.getContentText());
+}
+
+function doGet(e) {
+  return HtmlService.createHtmlOutput("Hi there");
+}
+
+function doPost(e) {
+  // this is where telegram works
+  var data = JSON.parse(e.postData.contents);
+  //GmailApp.sendEmail(Session.getEffectiveUser().getEmail(),"Message",JSON.stringify(data,null,4));
+  var text = data.message.text;
+  var id = data.message.chat.id;
+  var name = data.message.chat.first_name + " " + data.message.chat.last_name;
+  var answer = "Hi " + name + ", thank you for your comment %0A" + text;
+  var feedback = data.message.text
+  if(feedback == "hi"){sendText2(id)}
+  else{sendText(id)}
+  //sendText(id,answer);
+}
