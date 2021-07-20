@@ -1,0 +1,67 @@
+function doPost(e){
+  var estringa = JSON.parse(e.postData.contents);
+  var payload = identificar(estringa);
+  var token = "YOUR-TOKEN-BOT";
+  var data = {
+    "method": "post",
+    "payload": payload
+  }
+  UrlFetchApp.fetch("https://api.telegram.org/bot"+token+"/", data);
+}
+
+
+function identificar(e){
+  
+  if (e.message.text=="/help"){
+    var me = {"method": "sendMessage","chat_id": e.message.chat.id,"text": "ada yang bisa saya bantu?",}
+    return me }
+  
+  else if (e.message.text=="/start"){
+    var me = {"method": "sendMessage","chat_id": e.message.chat.id,"text": "salam kenal dari saya, sang bot",}
+    return me }
+  
+  else if (e.message.text=="/about"){
+    var me = {"method": "sendMessage","chat_id": e.message.chat.id,"text": "by @xoerbiston",}
+    return me }
+  
+  
+  else if (e.message.text=="/xlm"){
+      
+      var apixlm = "vip.bitcoin.co.id/api/str_idr/ticker";
+      res2 = UrlFetchApp.fetch(apixlm);
+      var retw2 = res2.getContentText();
+      var json2 = JSON.parse(retw2);
+      var last2 = json2.ticker.last;
+      var buy2 = json2.ticker.buy;
+      var sell2 = json2.ticker.sell;
+      var vol_str = json2.ticker.vol_str;
+      var vol2 = vol_str.split('.');
+      text2 = "XLM/IDR\nBuy: "+rp(buy2)+" IDR\nSell : "+rp(sell2)+" IDR\nVol : "+rp(vol2[0])+" XLM";
+      
+      var me = {"method": "sendMessage","chat_id": e.message.chat.id,"text": ""+text2,}
+      return me }
+  
+  
+}
+
+
+function rp(angka){
+			var number_string = angka.replace(/[^,\d]/g, '').toString(),
+			split   		= number_string.split(','),
+			sisa     		= split[0].length % 3,
+			rupiah     		= split[0].substr(0, sisa),
+			ribuan     		= split[0].substr(sisa).match(/\d{3}/gi);
+
+			// tambahkan titik jika yang di input sudah menjadi angka ribuan
+			if(ribuan){
+				separator = sisa ? '.' : '';
+				rupiah += separator + ribuan.join('.');
+			}
+
+			rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+            return rupiah;
+		}
+    
+    
+    
+    https://github.com/MeneerOom/Connect-Telegram-Bot-to-Google-Sheets
