@@ -1,0 +1,100 @@
+Telegram bot get message sticker photo and return message sticker photo
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------
+function doPost(e){
+  var estringa = JSON.parse(e.postData.contents);
+  var payload = identificar(estringa);
+  var data = {
+    "method": "post",
+    "payload": payload
+  }
+  UrlFetchApp.fetch("https://api.telegram.org/botYOUR-API-HERE/", data);
+}
+
+function identificar(e){
+  if (e.message.text){
+    var mensaje = {
+      "method": "sendMessage",
+      "chat_id": e.message.chat.id,
+      "text": e.message.text,
+    } 
+  }
+  else if (e.message.sticker){
+    var mensaje = {
+      "method": "sendSticker",
+      "chat_id": e.message.chat.id,
+      "sticker": e.message.sticker.file_id
+    }
+   }
+  else if (e.message.photo){
+    var array = e.message.photo;
+    var text = array[1];
+    var mensaje = {
+      "method": "sendPhoto",
+      "chat_id": e.message.chat.id,
+      "photo": text.file_id
+    }
+   }
+    else {
+    var mensaje = {
+      "method": "sendMessage",
+      "chat_id": e.message.chat.id,
+      "text": "Try other stuff"
+    }
+   }
+  return mensaje
+}---------------------------------------------------------------------------------------------------------------------------------------------------------
+function doPost(e) {
+  var update = JSON.parse(e.postData.contents);
+  // Make sure this is update is a type message
+  if (update.hasOwnProperty('message')) {
+    var msg = update.message;
+    var chatId = msg.chat.id;
+
+    // Make sure the update is a command.
+    if (
+      msg.hasOwnProperty('entities') &&
+      msg.entities[0].type == 'bot_command'
+    ) {
+      // If the user sends the /quote command
+      if (msg.text == '/quote') {
+        var url =
+          'https://quotesondesign.com/wp-json/wp/v2/posts/?orderby=rand';
+        var data = UrlFetchApp.fetch(url);
+        var posts = JSON.parse(data);
+        var post = posts.shift();
+
+        // Delete the html tags and \n (newline)
+        var cleanContent = post.content.rendered
+          .replace(/<(?:.|\n)*?>/gm, '')
+          .replace(/\n/gm, '');
+
+        // Format the quote
+        var quote =
+          '"' +
+          cleanContent +
+          '"\n — <strong>' +
+          post.title.rendered +
+          '</strong>';
+
+        var payload = {
+          method: 'sendMessage',
+          chat_id: String(chatId),
+          text: quote,
+          parse_mode: 'HTML',
+        };
+
+        var data = {
+          method: 'post',
+          payload: payload,
+        };
+
+        // Replace with your token
+        var API_TOKEN = '297019760:BAFbL3yMus67Qv3Xu6gQ7VB93Jq4dkVaGP4';
+        UrlFetchApp.fetch(
+          'https://api.telegram.org/bot' + API_TOKEN + '/',
+          data
+        );
+      }
+    }
+  }
+}
